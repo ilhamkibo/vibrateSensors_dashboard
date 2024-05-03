@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\ConceptController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +17,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+
 Route::get('/', function () {
-    return view('layouts.main');
+    return redirect('/dashboard');
 });
+
+Route::get('/dashboard', [DashboardController::class, 'render'])->name('home');
+Route::get('/concept', [ConceptController::class, 'render'])->name('concept');
+Route::get('/history', [HistoryController::class, 'render'])->name('history');
+Route::get('/users', [UserController::class, 'render'])->name('users');

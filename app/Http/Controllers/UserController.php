@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class DashboardController extends Controller
+class UserController extends Controller
 {
     public function render()
     {
-        return view('contents.dashboard', [
-            "header" => "Main Page"
+        return view('contents.user', [
+            'header' => 'Users Page'
         ]);
     }
 }

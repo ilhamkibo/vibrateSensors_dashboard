@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class DashboardController extends Controller
+class HistoryController extends Controller
 {
     public function render()
     {
-        return view('contents.dashboard', [
-            "header" => "Main Page"
+        return view('contents.history', [
+            'header' => 'Logs History Page'
         ]);
     }
 }
