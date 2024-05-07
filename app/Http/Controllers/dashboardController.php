@@ -10,7 +10,7 @@ class DashboardController extends Controller
     public function render()
     {
         return view('contents.dashboard', [
-            "header" => "Main Page"
+            "header" => "Monitoring Page"
         ]);
     }
 }

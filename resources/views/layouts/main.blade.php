@@ -16,6 +16,8 @@
     <link rel="stylesheet" href={{ asset("template/dist/css/adminlte.min.css") }}>
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href={{ asset("template/plugins/overlayScrollbars/css/OverlayScrollbars.min.css") }}>
+    @stack('styles')
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -32,7 +34,7 @@
         @include('layouts.sidebar')
 
         <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
+        <div class="content-wrapper bg-white">
             <!-- Content Header (Page header) -->
             {{-- <div class="content-header">
                 <div class="container-fluid">
@@ -85,6 +87,8 @@
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+    <script src={{ asset("js/mqtt.js") }}></script>
+    <script src={{ asset("js/sweetalert.js") }}></script>
     <script>
         console.log("uhuyy")
     </script>

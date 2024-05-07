@@ -39,15 +39,15 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href={{ route('users') }} class="nav-link {{ Request::is('users*') ? 'active' : '' }}">
                         <i class="nav-icon fa fa-users"></i>
                         <p>
                             Users
-                            {{-- <span class="right badge badge-danger">New</span> --}}
+                            <span class="right badge badge-danger">New</span>
                         </p>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
