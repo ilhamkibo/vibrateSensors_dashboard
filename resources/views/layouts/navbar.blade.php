@@ -15,22 +15,18 @@
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="far fa-bell"></i>
-                <span class="badge badge-danger navbar-badge">2</span>
+                <span class="badge badge-danger navbar-badge" id="notification-count">0</span>
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" bis_skin_checked="1">
-                <span class="dropdown-item dropdown-header">2 Notifications</span>
-                <div class="dropdown-divider" bis_skin_checked="1"></div>
-                <div href="#" class="dropdown-item">
-                    Device 1 is missing!
-                    <span class="float-right text-muted text-sm">17:00:32</span>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-item dropdown-header" id="notification-header">0 Notifications</span>
+                <div style="max-height: 200px; overflow-y: scroll">
+                    <div class="dropdown-divider"></div>
+                    <div id="notification-list"></div>
+                    <div class="dropdown-divider"></div>
                 </div>
-                <div class="dropdown-divider" bis_skin_checked="1"></div>
-                <div href="#" class="dropdown-item">
-                    Device 4 is missing!
-                    <span class="float-right text-muted text-sm">17:00:32</span>
-                </div>
-                <div class="dropdown-divider" bis_skin_checked="1"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+                <a href="{{ Request::is('history') ? '#' : route('history') }}"
+                    class="dropdown-item dropdown-footer">See
+                    All Notifications</a>
             </div>
         </li>
         @endauth
@@ -56,5 +52,39 @@
 </nav>
 
 @push('scripts')
+<script>
+    $(document).ready(function() {
+        function fetchNotifications() {
+            $.ajax({
+                url: 'http://127.0.0.1:8000/api/alerts',
+                method: 'GET',
+                success: function(response) {
+                    var alerts = response.data.filter(alert => alert.id); // Filter out empty objects
+                    var notificationCount = alerts.length;
+                    $('#notification-count').text(notificationCount);
+                    $('#notification-header').text(notificationCount + ' Notifications');
+                    var notificationList = $('#notification-list');
+                    notificationList.empty();
+                    
+                    alerts.forEach(function(alert) {
+                        var notificationItem = `
+                            <div class="dropdown-item">
+                                Device ${alert.device} is missing!
+                                <span class="float-right text-muted text-sm">${new Date(alert.created_at).toLocaleTimeString()}</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                        `;
+                        notificationList.append(notificationItem);
+                    });
+                }
+            });
+        }
 
+        // Fetch notifications on page load
+        fetchNotifications();
+
+        // Optionally, you can set an interval to fetch notifications periodically
+        setInterval(fetchNotifications, 1000); // Fetch every 60 seconds
+    });
+</script>
 @endpush

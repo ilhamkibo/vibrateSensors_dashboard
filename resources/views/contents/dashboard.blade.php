@@ -454,6 +454,7 @@
     var broker = "broker.emqx.io";
     var topics = ["vibrate1", "vibrate2", "vibrate3", "vibrate4", "vibrate5", "vibrate6", "vibrate7", "vibrate8", "vibrate9", "vibrate10", "vibrate11", "vibrate12", "vibrate13", "vibrate14", "vibrate15"];
     var clients = [];
+    let alertSw = false;
 
     // Create MQTT clients for each topic
     topics.forEach(function (topic, index) {
@@ -466,19 +467,26 @@
         };
 
         client.onMessageArrived = function (message) {
-            var { value } = JSON.parse(message.payloadString);
+            var { sensorValue, Status } = JSON.parse(message.payloadString);
             var cardId = "card-" + index;
             var deviceName = "Device " + (index + 1);
             var card = document.getElementById(cardId);
             
-            if (value === 0) {
-                showDeviceMissingAlert(`${deviceName} is missing!`)
+            console.log("🚀 ~ 0:", sensorValue, alertSw)
+            if (sensorValue === true && sensorValue !== alertSw ) {
+                showDeviceMissingAlert(`${deviceName} ${Status}!`)
+                console.log("🚀 ~ 1:", sensorValue, alertSw)
+                alertSw = true;
+            } else if (sensorValue === false) {
+                console.log("🚀 ~ 2:", sensorValue, alertSw)
+                alertSw = false;
             }
+
             // Update card background color based on received value
-            card.className = "card-header text-center"+ (value === 1 ? " bg-info" : " bg-red");
+            card.className = "card-header text-center"+ (sensorValue === false ? " bg-info" : " bg-red");
 
             // Update card body text based on received value
-            card.nextElementSibling.querySelector("h3").innerHTML = value === 1 ? "ON" : "OFF";
+            card.nextElementSibling.querySelector("h3").innerHTML = Status;
         };
 
         client.connect({

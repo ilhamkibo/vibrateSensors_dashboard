@@ -6,9 +6,9 @@
 @section('contents')
 <div class="container-fluid">
     <div class="row justify-content-center pt-2">
-        <div class="col-md-12 col-sm-12">
+        <div class="col-md-6 col-sm-6">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header bg-secondary">
                     <form>
                         @csrf
                         <div class="form-row">
@@ -33,7 +33,7 @@
                     </form>
                 </div>
                 <div class="card-body">
-                    <div>
+                    <div class="table-responsive" style="max-height: 400px;overflow: auto;display:inline-block;">
                         <table class="table table-striped">
                             <thead class="text-center">
                                 <tr>
@@ -44,7 +44,7 @@
                                 </tr>
                             </thead>
                             <tbody class="text-center">
-                                @forelse ($datas as $data)
+                                @forelse ($dataLogs as $data)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $data->device }}</td>
@@ -65,17 +65,70 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-6 col-sm-6">
+            <div class="card">
+                <div class="card-header bg-warning ">
+                    <div class="row d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5><strong>Notification</strong></h5>
+                        </div>
+                        <div>
+                            <button class="btn btn-danger" id="deleteAllBtn">Delete All</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 700px;overflow: auto;display:inline-block;">
+                        <table class="table table-striped">
+                            <thead class="text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Device</th>
+                                    <th>Status</th>
+                                    <th>Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alert-table-body" class="text-center">
+                                @forelse ($dataAlerts as $data)
+                                <tr id="alert-{{ $data->id }}">
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $data->device }}</td>
+                                    <td>{{ $data->active === 0 ? "Off" : "On" }}</td>
+                                    <td>{{ $data->created_at }}</td>
+                                    <td>
+                                        <button class="btn btn-info update-status" data-id="{{ $data->id }}">
+                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr id="no-data">
+                                    <td colspan="5">No Data Found</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    let datas  = <?php echo json_encode($datas); ?>;
-
+    let dataLogs  = <?php echo json_encode($dataLogs); ?>;
+    console.log("🚀 ~ dataLogs:", dataLogs)
+    
     // Membuat array labels dan data
-    const barPerLabels = datas.map(item => new Date(item.created_at).toLocaleTimeString('en-GB', {hour12: false}));
-    const dataChart = datas.map(item => item.value);
+    const barPerLabels = dataLogs.map(item => {
+        const date = new Date(item.created_at);
+        date.setHours(date.getHours() - 7); // Mengurangkan 7 jam dari waktu
+        return date.toLocaleTimeString();
+    });
+    const dataChart = dataLogs.map(item => item.value);
 
     const barPerData = {
         labels: barPerLabels,
@@ -89,17 +142,6 @@
                 pointRadius: 1
             }]
     };
-
-    // barPerData.datasets[0].data = barPerData.datasets[0].data.map(item => {
-    //     const localDate = new Date(item.x);
-    //     localDate.setHours(localDate.getHours() - 7); 
-
-    //     return {
-    //         x: localDate.toISOString(), 
-    //         y: item.y
-    //     };
-    // });
-
 
     const barPerConfig = {
         type: 'line',
@@ -159,6 +201,69 @@
         document.getElementById('myChart'),
         barPerConfig
     );
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Handler untuk klik tombol update status
+        $('.update-status').on('click', function() {
+            var alertId = $(this).data('id');
+            
+            $.ajax({
+                url: '/api/alerts/' + alertId + '/update',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}' // Laravel CSRF token
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Remove row from table
+                        $('#alert-' + alertId).remove();
+                        
+                        // Check if the table body is empty
+                        if ($('#alert-table-body').children().length === 0) {
+                            $('#alert-table-body').append(`
+                                <tr id="no-data">
+                                    <td colspan="5">No Data Found</td>
+                                </tr>
+                            `);
+                        }
+                    } else {
+                        Swal.fire('Error', 'Failed to update the alert status', 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Failed to update the alert status', 'error');
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        // Fungsi untuk menghapus semua notifikasi
+        $('#deleteAllBtn').click(function () {
+            // Lakukan AJAX request
+            $.ajax({
+                url: '/api/deleteAllNotifications',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function (data) {
+                    // Jika request berhasil
+                    if (data.success) {
+                        // Hapus semua notifikasi dari DOM
+                        $('#alert-table-body').html('<tr id="no-data"><td colspan="5">No Data Found</td></tr>');
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
 </script>
 
 @endpush

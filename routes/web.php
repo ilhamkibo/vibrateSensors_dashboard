@@ -43,4 +43,6 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/register', [RegisterController::class, 'store'])->name("register-form");
 });
 
-Route::get('/api/logs', [LogController::class, 'getLogs']);
+Route::get('/api/alerts', [LogController::class, 'getLogs']);
+Route::post('/api/alerts/{id}/update', [LogController::class, 'updateActive']);
+Route::post('/api/deleteAllNotifications', [LogController::class, 'deleteAllNotifications']);
