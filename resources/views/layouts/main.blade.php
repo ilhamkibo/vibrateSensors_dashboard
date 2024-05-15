@@ -89,9 +89,12 @@
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
     <script src={{ asset("js/mqtt.js") }}></script>
     <script src={{ asset("js/sweetalert.js") }}></script>
-    <script>
-        console.log("uhuyy")
-    </script>
+    <script src={{ asset('js/chartjs.js') }}></script>
+    <script src={{ asset('js/momentjs.js') }}></script>
+    <script src={{ asset('js/chartjs-adapter-moment.js') }}></script>
+    <script src={{ asset('js/hammerjs.js') }}></script>
+    <script src={{ asset('js/chartjs-plugin-zoom.js') }}></script>
+
     @stack('scripts')
 </body>
 

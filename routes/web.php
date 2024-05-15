@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\LogController;
 use App\Http\Controllers\ConceptController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoryController;
@@ -41,3 +42,5 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/register', [RegisterController::class, 'index'])->name("register");
     Route::post('/register', [RegisterController::class, 'store'])->name("register-form");
 });
+
+Route::get('/api/logs', [LogController::class, 'getLogs']);

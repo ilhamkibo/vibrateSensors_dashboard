@@ -56,8 +56,5 @@
 </nav>
 
 @push('scripts')
-<script>
-    console.log("NAVBARR")
-</script>
 
 @endpush
